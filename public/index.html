@@ -7,25 +7,49 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/2.3.6/fabric.min.js"></script>
   </head>
   <body>
-    <canvas id="monitor" width="800" height="800"></canvas>
+    <canvas id="monitor" width="800" height="500"></canvas>
     <script>
-      // const data = fetch("local");
-      const arr = [-0.4, -0.1, 0.3, 0.5, 0.6];
-
       var canvas = new fabric.Canvas("monitor");
 
-      arr.forEach((element, index) => {
-        const color = element < 0 ? "red" : "green";
-        const scale = Math.abs(element) * 800;
-        var rect = new fabric.Rect({
-          left: 20 * index,
-          top: scale,
-          fill: color,
-          width: 20,
-          height: 20,
+      const middleHeight = 250;
+
+      canvas.add(
+        new fabric.Line([0, middleHeight, 800, middleHeight], {
+          fill: "blue",
+          stroke: "blue",
+          strokeWidth: 4,
+        })
+      );
+
+      const getData = async () => {
+        try {
+          let data = await fetch("http://localhost:3030/api/test");
+          data = data.json();
+          return data;
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+      const render = async () => {
+        const data = await getData();
+        // console.log(data);
+        data.forEach((data, index) => {
+          console.log(data.createdAt);
+          const color = data.score < 0 ? "red" : "green";
+          const scale = data.score * -1 * middleHeight + 250;
+          var rect = new fabric.Rect({
+            left: 20 * index,
+            top: scale,
+            fill: color,
+            width: 20,
+            height: 20,
+          });
+          canvas.add(rect);
         });
-        canvas.add(rect);
-      });
+      };
+
+      render();
     </script>
   </body>
 </html>
